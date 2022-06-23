@@ -1,3 +1,4 @@
+from doctest import REPORT_NDIFF
 import os
 from urllib import response
 from flask import Flask, request, abort, jsonify
@@ -20,11 +21,13 @@ def create_app(test_config=None):
     cors = CORS(app, resources={r'*/api/v1/*': {'origins': '*'}})
 
     """
-    @TODO: Use the after_request decorator to set Access-Control-Allow
+    @TODO: Use the after_request decorator to set Access-Control-Allow [COMPLETED]
     """
-    
-
-
+    @app.after_request
+    def after_request(response):
+        response.headers.add('Access-Control-Allow-Headers', 'Content-type, Authorization')
+        response.headers.add('Access-Control-Allow-Methods', 'GET, POST, PATCH, DELETE, OPTIONS')
+        return response
 
     """
     @TODO:

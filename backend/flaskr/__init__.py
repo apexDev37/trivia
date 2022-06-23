@@ -1,4 +1,5 @@
 import os
+from urllib import response
 from flask import Flask, request, abort, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
@@ -14,12 +15,16 @@ def create_app(test_config=None):
     setup_db(app)
 
     """
-    @TODO: Set up CORS. Allow '*' for origins. Delete the sample route after completing the TODOs
+    @TODO: Set up CORS. Allow '*' for origins. Delete the sample route after completing the TODOs [COMPLETED]
     """
+    cors = CORS(app, resources={r'*/api/v1/*': {'origins': '*'}})
 
     """
     @TODO: Use the after_request decorator to set Access-Control-Allow
     """
+    
+
+
 
     """
     @TODO:

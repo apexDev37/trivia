@@ -38,8 +38,18 @@ def create_app(test_config=None):
     
     @app.route('/api/v1/categories', methods=['GET'])
     def retrieve_categories():
-        categories = db.session.query(Category).all()
-        formatted_categories = {category.id:category.type for category in categories}
+        # Handle data
+        try:
+            categories = db.session.query(Category).all()
+            formatted_categories = {category.id:category.type for category in categories}
+        except: 
+            abort(500)
+
+        # Verify resource data
+        if len(formatted_categories) == 0:
+            abort(404)
+
+        # Handle response
         return jsonify({
             'success': True,
             'status_code': 200,
@@ -62,10 +72,17 @@ def create_app(test_config=None):
     @app.route('/api/v1/questions', methods=['GET'])
     def retrieve_questions():
         # Handle data
-        questions = db.session.query(Question).order_by(Question.id).all()
-        paginated_questions = paginate_questions(request, questions)
-        response = retrieve_categories()
-        data = json.loads(json.dumps(response.json))
+        try:
+            questions = db.session.query(Question).order_by(Question.id).all()
+            paginated_questions = paginate_questions(request, questions)
+            response = retrieve_categories()
+            data = json.loads(json.dumps(response.json))
+        except:
+            abort(500)
+
+        # Verify resource data
+        if len(questions) == 0:
+            abort(404)
 
         # Handle response
         return jsonify({
@@ -186,5 +203,5 @@ def create_app(test_config=None):
             'message': 'internal server error'
         }), 500
     
-    
+
     return app

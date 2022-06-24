@@ -6,7 +6,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 import random
 
-from models import setup_db, Question, Category
+from models import db, setup_db, Question, Category
 
 QUESTIONS_PER_PAGE = 10
 
@@ -18,23 +18,32 @@ def create_app(test_config=None):
     """
     @TODO: Set up CORS. Allow '*' for origins. Delete the sample route after completing the TODOs [COMPLETED]
     """
-    cors = CORS(app, resources={r'*/api/v1/*': {'origins': '*'}})
+    cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
 
     """
     @TODO: Use the after_request decorator to set Access-Control-Allow [COMPLETED]
     """
     @app.after_request
     def after_request(response):
-        response.headers.add('Access-Control-Allow-Headers', 'Content-type, Authorization')
+        response.headers.add('Access-Control-Allow-Headers', 'Content-type, Authorization, true')
         response.headers.add('Access-Control-Allow-Methods', 'GET, POST, PATCH, DELETE, OPTIONS')
         return response
 
     """
     @TODO:
     Create an endpoint to handle GET requests
-    for all available categories.
+    for all available categories. [COMPLETED]
     """
-
+    
+    @app.route('/api/v1/categories', methods=['GET'])
+    def retrieve_categories():
+        categories = db.session.query(Category).all()
+        formatted_categories = {category.id:category.type for category in categories}
+        return jsonify({
+            'success': True,
+            'status_code': 200,
+            'categories': formatted_categories
+        })
 
     """
     @TODO:
@@ -48,6 +57,31 @@ def create_app(test_config=None):
     ten questions per page and pagination at the bottom of the screen for three pages.
     Clicking on the page numbers should update the questions.
     """
+
+    @app.route('/api/v1/questions', methods=['GET'])
+    def retrieve_questions():
+        # Handle data
+        questions = db.session.query(Question).all()
+        response = retrieve_categories()
+
+        # Handle response
+        return jsonify({
+            'success': True,
+            'questions': '',
+            'total_questions': len(questions),
+            'categories': response.get('categories'),
+            'current_category': 'Science',
+        })
+    
+    def paginate_questions(request, questions):
+        # Implementation to return paginated questions
+        page = request.args.get('page', 1, type=int)
+        start = (page - 1) * QUESTIONS_PER_PAGE
+        end = start + QUESTIONS_PER_PAGE
+
+        formatted_questions = [question.format() for question in questions]
+        paginated_questions = formatted_questions[start:end]
+        return paginated_questions
 
     """
     @TODO:

@@ -22,7 +22,7 @@ class QuestionView extends Component {
 
   getQuestions = () => {
     $.ajax({
-      url: `/questions?page=${this.state.page}`, //TODO: update request URL
+      url: `http://127.0.0.1:5000/api/v1/questions?page=${this.state.page}`, //TODO: update request URL [COMPLETED]
       type: 'GET',
       success: (result) => {
         this.setState({

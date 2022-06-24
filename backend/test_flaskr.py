@@ -96,6 +96,7 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(data['message'], 'method not allowed')
     
     # --- QUESTIONS
+    # GET questions
 
     def test_200_when_retrieving_paginated_questions(self):
         """
@@ -139,6 +140,53 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 404)
         self.assertEqual(data['success'], False)
         self.assertEqual(data['message'], 'requested resource not found')
+
+
+    # DELETE questions
+
+    def test_200_when_deleting_a_question_by_given_valid_id(self):
+        """
+        Test that API method returns a 200
+        success response when requesting to
+        delete a question resource by its Id.
+        """
+
+        # Given
+        existing_question_id = 9
+        endpoint = '/api/v1/questions/{}'.format(existing_question_id)
+
+        # When
+        response = self.client().delete(endpoint)
+        data = json.loads(response.data)
+
+        # Then
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(data['success'], True)
+
+    def test_404_when_deleting_a_question_by_given_id_that_does_not_exist(self):
+        """
+        Test that API method returns a 404
+        error response when requesting to
+        delete a question resource by a given
+        Id that does not exist in the database.
+        """
+
+        # Given
+        non_existing_question_id = 404
+        endpoint = '/api/v1/questions/{}'.format(non_existing_question_id)
+        
+        # When
+        response = self.client().delete(endpoint)
+        data = json.loads(response.data)
+
+        # Then
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(data['success'], False)
+        self.assertEqual(data['message'], 'requested resource not found')
+
+
+
+
 
 
 

@@ -1,4 +1,5 @@
 from doctest import REPORT_NDIFF
+import json
 import os
 from urllib import response
 from flask import Flask, request, abort, jsonify
@@ -50,7 +51,7 @@ def create_app(test_config=None):
     Create an endpoint to handle GET requests for questions,
     including pagination (every 10 questions).
     This endpoint should return a list of questions,
-    number of total questions, current category, categories.
+    number of total questions, current category, categories. [COMPLETED]
 
     TEST: At this point, when you start the application
     you should see questions and categories generated,
@@ -61,24 +62,27 @@ def create_app(test_config=None):
     @app.route('/api/v1/questions', methods=['GET'])
     def retrieve_questions():
         # Handle data
-        questions = db.session.query(Question).all()
+        questions = db.session.query(Question).order_by(Question.id).all()
+        paginated_questions = paginate_questions(request, questions)
         response = retrieve_categories()
+        data = json.loads(json.dumps(response.json))
 
         # Handle response
         return jsonify({
             'success': True,
-            'questions': '',
+            'questions': paginated_questions,
             'total_questions': len(questions),
-            'categories': response.get('categories'),
+            'categories': data.get('categories'),
             'current_category': 'Science',
         })
     
     def paginate_questions(request, questions):
-        # Implementation to return paginated questions
+        # Implement pagination
         page = request.args.get('page', 1, type=int)
         start = (page - 1) * QUESTIONS_PER_PAGE
         end = start + QUESTIONS_PER_PAGE
 
+        # Format data
         formatted_questions = [question.format() for question in questions]
         paginated_questions = formatted_questions[start:end]
         return paginated_questions

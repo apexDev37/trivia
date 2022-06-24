@@ -1,3 +1,4 @@
+from crypt import methods
 from doctest import REPORT_NDIFF
 import json
 import os
@@ -114,11 +115,34 @@ def create_app(test_config=None):
 
     """
     @TODO:
-    Create an endpoint to DELETE question using a question ID.
+    Create an endpoint to DELETE question using a question ID. [COMPLETED]
 
     TEST: When you click the trash icon next to a question, the question will be removed.
     This removal will persist in the database and when you refresh the page.
     """
+
+    @app.route('/api/v1/questions/<int:question_id>', methods=['DELETE'])
+    def delete_question_by_id(question_id):
+        # Handle request
+        if request.method != 'DELETE':
+            abort(405)
+
+		# Handle data
+        question = db.session.query(Question).get_or_404(question_id)
+
+		# Verify resource data
+        try:
+            db.session.delete(question)
+            db.session.commit()
+        except:
+            abort(500)
+
+		# Handle response
+        return jsonify({
+            'success': True,
+            'status_code': 200
+        })
+        
 
     """
     @TODO:
@@ -166,7 +190,7 @@ def create_app(test_config=None):
     """
     @TODO:
     Create error handlers for all expected errors
-    including 404 and 422.
+    including 404 and 422. [COMPLETED]
     """
 
     # --- App Request, Error Handlers

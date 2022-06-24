@@ -89,7 +89,7 @@ def create_app(test_config=None):
             abort(500)
 
         # Verify resource data
-        if len(questions) == 0:
+        if len(paginated_questions) == 0:
             abort(404)
 
         # Handle response

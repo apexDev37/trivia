@@ -1,6 +1,7 @@
 import os
 import unittest
 import json
+from urllib import response
 from flask_sqlalchemy import SQLAlchemy
 
 from flaskr import create_app
@@ -33,6 +34,8 @@ class TriviaTestCase(unittest.TestCase):
     TODO
     Write at least one test for each test for successful operation and for expected errors.
     """
+
+    # --- CATEGORIES
 
     def test_retrieve_all_categories_from_db(self):
         """
@@ -91,6 +94,52 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(data['success'], False)
         self.assertNotIn('categories', data, 'categories key should not be in data')
         self.assertEqual(data['message'], 'method not allowed')
+    
+    # --- QUESTIONS
+
+    def test_200_when_retrieving_paginated_questions(self):
+        """
+        Test that API method returns a success
+        response with all the questions in the db
+        within valid pagination pages
+        """
+
+        # Given
+        valid_page_number = 2
+        endpoint = '/api/v1/questions?page={}'.format(valid_page_number)
+
+        # When
+        response = self.client().get(endpoint)
+        data = json.loads(response.data)
+
+        # Then
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(data['success'], True)
+        self.assertTrue(data['questions'])
+        self.assertTrue(data['categories'])
+        self.assertGreater(data['total_questions'], 0)
+
+    
+    def test_404_when_requesting_questions_beyond_valid_pagination_page(self):
+        """
+        Test that API method returns a 404 error
+        response when questions beyond a valid
+        pagination page are requested. 
+        """
+
+        # Given
+        page_number = 570
+        endpoint = '/api/v1/questions?page={}'.format(page_number)
+
+        # When
+        response = self.client().get(endpoint)
+        data = json.loads(response.data)
+
+        # Then
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(data['success'], False)
+        self.assertEqual(data['message'], 'requested resource not found')
+
 
 
 

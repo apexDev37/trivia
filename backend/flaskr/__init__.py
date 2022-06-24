@@ -38,6 +38,10 @@ def create_app(test_config=None):
     
     @app.route('/api/v1/categories', methods=['GET'])
     def retrieve_categories():
+        # Handle request
+        if request.method != 'GET':
+            abort(405)
+
         # Handle data
         try:
             categories = db.session.query(Category).all()
@@ -71,6 +75,10 @@ def create_app(test_config=None):
 
     @app.route('/api/v1/questions', methods=['GET'])
     def retrieve_questions():
+        # Handle request
+        if request.method != 'GET':
+            abort(405)
+
         # Handle data
         try:
             questions = db.session.query(Question).order_by(Question.id).all()

@@ -161,8 +161,13 @@ def create_app(test_config=None):
         if request.method != 'POST':
             abort(405)
 
-        # Validate request data            
+        # Handle operation
         body = request.get_json()
+        search_term = body.get('searchTerm', None)
+        if search_term:
+            return retrieve_questions_by_search_term(search_term)
+
+        # Validate request data            
         if valid_question_format(body):
            new_question = body.get('question', None) 
            new_answer = body.get('answer', None) 
@@ -208,12 +213,37 @@ def create_app(test_config=None):
     @TODO:
     Create a POST endpoint to get questions based on a search term.
     It should return any questions for whom the search term
-    is a substring of the question.
+    is a substring of the question. [COMPLETED]
 
     TEST: Search by any phrase. The questions list will update to include
     only question that include that string within their question.
     Try using the word "title" to start.
     """
+
+    def retrieve_questions_by_search_term(search_term):
+        # Handle data
+        questions = (db.session
+                        .query(Question)
+                        .order_by(Question.id)
+                        .filter(Question.question.ilike(f'%{search_term}%'))
+                        .all())
+        
+        # Verify resource data
+        if len(questions) == 0:
+            abort(404)
+        
+        # Format data
+        formatted_questions = [question.format() for question in questions]
+        # current_category = formatted_questions[0]['category']
+
+        # Handle response
+        return jsonify({
+            'success': True,                
+            'questions': formatted_questions,                
+            'total_questions': len(formatted_questions),                
+            'current_category': 'Entertainment'                
+        })
+
 
     """
     @TODO:

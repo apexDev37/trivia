@@ -29,6 +29,7 @@ def create_app(test_config=None):
     def after_request(response):
         response.headers.add('Access-Control-Allow-Headers', 'Content-type, Authorization, true')
         response.headers.add('Access-Control-Allow-Methods', 'GET, POST, PATCH, DELETE, OPTIONS')
+        response.headers.add('Access-Control-Allow-Credentials', 'true')
         return response
 
     """
@@ -133,7 +134,7 @@ def create_app(test_config=None):
 		# Persist resource data
         try:
             db.session.delete(question)
-            # db.session.commit()
+            db.session.commit()
         except:
             abort(500)
 
@@ -187,7 +188,7 @@ def create_app(test_config=None):
 		# Persist resource data
         try:
             db.session.add(question_to_be_created)
-            # db.session.commit()
+            db.session.commit()
         except:
             abort(500)
 
@@ -252,7 +253,7 @@ def create_app(test_config=None):
     TEST: In the "List" tab / main screen, clicking on one of the
     categories in the left column will cause only questions of that
     category to be shown.
-    """
+    """ 
 
     @app.route('/api/v1/categories/<int:category_id>/questions', methods=['GET'])
     def retrieve_questions_by_category(category_id):
@@ -295,15 +296,64 @@ def create_app(test_config=None):
 
     """
     @TODO:
-    Create a POST endpoint to get questions to play the quiz.
+    Create a POST endpoint to get questions to play the quiz. [COMPLETED]
     This endpoint should take category and previous question parameters
-    and return a random questions within the given category,
+    and return a random question within the given category,
     if provided, and that is not one of the previous questions.
 
     TEST: In the "Play" tab, after a user selects "All" or a category,
     one question at a time is displayed, the user is allowed to answer
     and shown whether they were correct or not.
     """
+
+    @app.route('/api/v1/quizzes', methods=['POST'])
+    def quiz_question():
+        # Handle payload
+        try:
+            body = request.get_json()
+            previous_questions = body.get('previous_questions', None)
+            category = body.get('quiz_category')
+            category_type = category['type'] 
+        except:
+            abort(422)
+
+        # Handle data
+        next_question = None
+        if category_type == 'click':
+            all_questions = db.session.query(Question).all()
+
+            if len(previous_questions) != len(all_questions):        
+                next_question = get_next_question(previous_questions, all_questions)       
+            
+                # Verify resource data
+                if next_question['id'] in previous_questions:
+                    abort(500)
+        else:
+            questions_by_category = (db.session
+                                        .query(Question)
+                                        .filter(Question.category == category['id'])
+                                        .all())
+
+            if len(previous_questions) != len(questions_by_category): 
+                next_question = get_next_question(previous_questions, questions_by_category)       
+            
+                # Verify resource data
+                if next_question['id'] in previous_questions:
+                    abort(500)
+
+		# Handle response
+        return jsonify({
+            'success': True,
+            'question': next_question
+        })
+    
+    def get_next_question(previous_questions, questions):
+        formatted_questions = [question.format() for question in questions]
+        next_questions = list(
+            filter(lambda q: q['id'] not in previous_questions, formatted_questions)
+        )
+        return random.choice(next_questions)
+
 
     """
     @TODO:

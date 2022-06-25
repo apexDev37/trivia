@@ -237,8 +237,50 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(data['message'], 'bad request')
 
 
+    # POST questions (search term)
 
+    def test_200_searching_questions_by_a_given_search_term(self):
+        """
+        Test that API method returns a 200
+        success response when requesting for
+        question resources based on a given search term.
+        """
 
+        # Given
+        search_term = {'searchTerm': 'title'}
+        endpoint = '/api/v1/questions' 
+
+		# When
+        response = self.client().post(endpoint, json=search_term)
+        data = json.loads(response.data)
+
+		# Then
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(data['success'], True)
+        self.assertTrue(data['questions'])
+        self.assertGreater(data['total_questions'], 0)
+        self.assertTrue(data['current_category'])
+
+    def test_404_searching_questions_by_a_given_search_term_that_do_not_exist(self):
+        """
+        Test that API method returns a 404
+        error response when requesting for
+        question resources based on a given search term
+        that do not exist in the database.
+        """
+
+        # Given
+        search_term = {'searchTerm': 'udacity'}
+        endpoint = '/api/v1/questions' 
+
+		# When
+        response = self.client().post(endpoint, json=search_term)
+        data = json.loads(response.data)
+
+		# Then
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(data['success'], False)
+        self.assertEqual(data['message'], 'requested resource not found') 
 
 
 # Make the tests conveniently executable

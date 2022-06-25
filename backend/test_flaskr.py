@@ -141,6 +141,51 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(data['success'], False)
         self.assertEqual(data['message'], 'requested resource not found')
 
+    
+    # GET questions based on category
+
+    def test_200_retrieving_questions_based_on_a_valid_given_category_id(self):
+        """
+        Test that API method returns a 200
+        success response when requesting for
+        question resources based on a given category id.
+        """
+
+        # Given
+        category_id = 1
+        endpoint = f'/api/v1/categories/{category_id}/questions'
+		
+        # When
+        response = self.client().get(endpoint)
+        data = json.loads(response.data)
+
+		# Then
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(data['success'], True)
+        self.assertTrue(data['questions'])
+        self.assertGreater(data['total_questions'], 0)
+        self.assertTrue(data['current_category'])
+
+    def test_404_retrieving_questions_based_on_an_invalid_given_category_id(self):
+        """
+        Test that API method returns a 404
+        error response when requesting for
+        question resources based on an invalid given category id.
+        """
+
+        # Given
+        category_id = 404
+        endpoint = f'/api/v1/categories/{category_id}/questions'
+		
+        # When
+        response = self.client().get(endpoint)
+        data = json.loads(response.data)
+
+		# Then
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(data['success'], False)
+        self.assertTrue(data['message'], 'requested resource not found')
+
 
     # DELETE questions
 

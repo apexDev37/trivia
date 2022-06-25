@@ -247,12 +247,51 @@ def create_app(test_config=None):
 
     """
     @TODO:
-    Create a GET endpoint to get questions based on category.
+    Create a GET endpoint to get questions based on category. [COMPLETED]
 
     TEST: In the "List" tab / main screen, clicking on one of the
     categories in the left column will cause only questions of that
     category to be shown.
     """
+
+    @app.route('/api/v1/categories/<int:category_id>/questions', methods=['GET'])
+    def retrieve_questions_by_category(category_id):
+        # Handle request
+        if request.method != 'GET':
+            abort(405)
+        
+        # Verify valid category id
+        category = db.session.query(Category).get_or_404(category_id)
+        category_type = category.format()['type']
+
+		# Handle data
+        try:
+            questions_by_category = (
+                db.session
+                    .query(Question)
+                    .filter(Question.category == category_id)
+                    .all()
+            )
+            formatted_questions_by_category = [
+                question.format() 
+                for question in questions_by_category
+            ]
+        except:
+            abort(500)
+
+		# Verify resource data
+        total_questions_by_category = len(formatted_questions_by_category)
+        if total_questions_by_category == 0:
+            abort(404)
+
+		# Handle response
+        return jsonify({
+            'success': True,
+            'questions': formatted_questions_by_category,
+            'total_questions': total_questions_by_category,
+            'current_category': category_type
+        })
+
 
     """
     @TODO:

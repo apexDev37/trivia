@@ -152,7 +152,7 @@ class TriviaTestCase(unittest.TestCase):
         """
 
         # Given
-        existing_question_id = 9
+        existing_question_id = 5
         endpoint = '/api/v1/questions/{}'.format(existing_question_id)
 
         # When
@@ -185,6 +185,56 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(data['message'], 'requested resource not found')
 
 
+    # POST questions
+
+    def test_200_when_creating_a_new_valid_question_resource(self):
+        """
+        Test that API method returns a 200
+        success response when requesting
+        to create a new question resource.
+        """
+        
+        # Given
+        endpoint = '/api/v1/questions'
+        new_question = {
+            'question': 'What is the earths only natural satellite',
+            'answer': 'Moon',
+            'difficulty': 1,
+            'category': 1
+        }
+
+		# When
+        response = self.client().post(endpoint, json=new_question)
+        data = json.loads(response.data)
+
+		# Then
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(data['success'], True)
+
+    def test_400_when_creating_a_new_question_resource_with_invalid_format(self):
+        """
+        Test that API method returns a 400
+        error response when requesting
+        to create a new question resource
+        with an invalid body format or null values.        
+        """
+
+        # Given
+        endpoint = '/api/v1/questions'
+        invalid_new_question = {
+            'query': 'What is the earths only natural satellite',
+            'solution': 'Moon',
+            'level': 1
+        }
+
+		# When
+        response = self.client().post(endpoint, json=invalid_new_question)
+        data = json.loads(response.data)
+
+		# Then
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(data['success'], False)
+        self.assertEqual(data['message'], 'bad request')
 
 
 

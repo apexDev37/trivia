@@ -130,10 +130,10 @@ def create_app(test_config=None):
 		# Handle data
         question = db.session.query(Question).get_or_404(question_id)
 
-		# Verify resource data
+		# Persist resource data
         try:
             db.session.delete(question)
-            db.session.commit()
+            # db.session.commit()
         except:
             abort(500)
 
@@ -148,12 +148,61 @@ def create_app(test_config=None):
     @TODO:
     Create an endpoint to POST a new question,
     which will require the question and answer text,
-    category, and difficulty score.
+    category, and difficulty score. [COMPLETED]
 
     TEST: When you submit a question on the "Add" tab,
     the form will clear and the question will appear at the end of the last page
     of the questions list in the "List" tab.
     """
+
+    @app.route('/api/v1/questions', methods=['POST'])
+    def create_new_question():
+        # Handle request
+        if request.method != 'POST':
+            abort(405)
+
+        # Validate request data            
+        body = request.get_json()
+        if valid_question_format(body):
+           new_question = body.get('question', None) 
+           new_answer = body.get('answer', None) 
+           new_difficulty = body.get('difficulty', None) 
+           new_category = body.get('category', None) 
+        else:
+            abort(400)
+
+		# Handle data
+        question_to_be_created = Question(
+            question=new_question,
+            answer=new_answer,
+            difficulty=new_difficulty,
+            category=new_category
+        )
+
+		# Persist resource data
+        try:
+            db.session.add(question_to_be_created)
+            # db.session.commit()
+        except:
+            abort(500)
+
+		# Handle response
+        return jsonify({
+            'success': True,
+            'status_code': 200
+        })
+
+    def valid_question_format(body):
+        # Verify all required keys are present
+        required_keys = ['question', 'answer', 'difficulty', 'category']
+        is_present = all(key in body for key in required_keys)
+        if not is_present: 
+            return False
+
+        # Verify all keys have non zero or empty values
+        has_values = all(body[key] for key in required_keys)
+        return True if has_values else False
+
 
     """
     @TODO:

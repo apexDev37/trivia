@@ -109,7 +109,6 @@ URI: `GET '/api/v1/questions?page=${integer}'`
       "id": 15,
       "question": "The Taj Mahal is located in which Indian city?"
     }
-    // eight more question objects
   ],
   "success": true,
   "total_questions": 18
@@ -173,7 +172,7 @@ Request Body:
 ```json
 {
     "previous_questions": [5, 4, 10, 11],
-    "quiz_category": "current category"
+    "quiz_category": {"type": "click", "id": 4}
 }
 ```
 

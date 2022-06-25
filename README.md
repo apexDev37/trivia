@@ -47,3 +47,205 @@ Pay special attention to what data the frontend is expecting from each API respo
 By making notes ahead of time, you will practice the core skill of being able to read and understand code and will have a simple plan to follow to build out the endpoints of your backend API.
 
 > View the [Frontend README](./frontend/README.md) for more details.
+
+## API Documentation
+
+### Expected endpoints and behaviors
+
+---
+
+URI: `GET '/api/v1/categories'`
+
+- Retrieves a dictionary of categories in which the keys are the ids and the value is the corresponding string of the category
+- Request Arguments: None
+- Returns: A JSON object with keys, categories, that contains an object of id: category_string key:value pairs and appropriate HTTP status code and success boolean.
+
+```json
+{
+  "categories": {
+    "1": "Science",
+    "2": "Art",
+    "3": "Geography",
+    "4": "History",
+    "5": "Entertainment",
+    "6": "Sports"
+  },
+  "success": true,
+  "status_code": 200
+}
+```
+
+---
+
+URI: `GET '/api/v1/questions?page=${integer}'`
+
+- Retrieves a set of questions, the total number of questions, all categories, the current category string and a success boolean.
+- Request Arguments: `page` of type `integer`
+- Returns: A JSON object with 10 paginated questions, total questions, object including all categories, current category string, and success boolean
+
+```json
+{
+  "categories": {
+    "1": "Science",
+    "2": "Art",
+    "3": "Geography",
+    "4": "History",
+    "5": "Entertainment",
+    "6": "Sports"
+  },
+  "current_category": "Science",
+  "questions": [
+    {
+      "answer": "Apollo 13",
+      "category": 5,
+      "difficulty": 4,
+      "id": 2,
+      "question": "What movie earned Tom Hanks his third straight Oscar nomination, in 1996?"
+    },
+    {
+      "answer": "Agra",
+      "category": 3,
+      "difficulty": 2,
+      "id": 15,
+      "question": "The Taj Mahal is located in which Indian city?"
+    }
+    // eight more question objects
+  ],
+  "success": true,
+  "total_questions": 18
+}
+```
+
+---
+
+URI: `GET '/api/categories/${id}/questions'`
+
+- Retrieves questions for a given cateogry specified by an id request argument
+- Request Arguments: `id` of type `integer`
+- Returns: A JSON object with questions for the specified category, total questions, and current category string
+
+```json
+{
+  "current_category": "Science",
+  "questions": [
+    {
+      "answer": "Alexander Fleming",
+      "category": 1,
+      "difficulty": 3,
+      "id": 21,
+      "question": "Who discovered penicillin?"
+    },
+    {
+      "answer": "Blood",
+      "category": 1,
+      "difficulty": 4,
+      "id": 22,
+      "question": "Hematology is a branch of medicine involving the study of what?"
+    }
+  ],
+  "success": true,
+  "total_questions": 2
+}
+```
+
+---
+
+URI: `DELETE '/api/v1/questions/${id}'`
+
+- Deletes a specified question resource by a given valid using question id
+- Request Arguments: `id` of type `integer`
+- Returns: A JSON object with the appropriate HTTP status code and success boolean. 
+
+```json
+{
+  "status_code": 200,
+  "success": true
+}
+```
+
+---
+
+URI: `POST '/api/v1/quizzes'`
+
+- Sends a post request to retrieve a new, next question for the quizz game
+Request Body:
+
+```json
+{
+    "previous_questions": [5, 4, 10, 11],
+    "quiz_category": "current category"
+}
+```
+
+- Returns: A JSON object with single, new, question object and success boolean.
+
+```json
+{
+  "question": {
+    "id": 12,
+    "question": "Who invented Peanut Butter?",
+    "answer": "George Washington Carver",
+    "difficulty": 2,
+    "category": 4
+  },
+  "success": true
+}
+```
+
+---
+
+URI: `POST '/api/v1/questions'`
+
+- Sends a post request in order to create a new question resource
+Request Body:
+
+```json
+{
+  "question": "What is the largest lake in Africa?",
+  "answer": "Lake Victoria",
+  "difficulty": 2,
+  "category": 3
+}
+```
+
+- Returns: A JSON object with the appropriate HTTP status code and success boolean. 
+
+```json
+{
+  "status_code": 200,
+  "success": true
+}
+```
+
+---
+
+URI: `POST '/api/v1/questions'`
+
+- Sends a post request in to search for a specific question or set of questions by a given search term
+Request Body:
+
+```json
+{
+  "searchTerm": "title"
+}
+```
+
+- Returns: A JSON object with an array of questions, the number of totalQuestions that met the search term, the current category string, and success boolean.
+
+```json
+{
+  "questions": [
+    {
+      "id": 5,
+      "question": "Whose autobiography is entitled 'I Know Why the Caged Bird Sings'?",
+      "answer": "Maya Angelou",
+      "difficulty": 2,
+      "category": 4
+    }
+  ],
+  "totalQuestions": 1,
+  "currentCategory": "Entertainment",
+  "success": true
+}
+```
+

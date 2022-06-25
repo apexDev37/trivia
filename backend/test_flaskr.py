@@ -1,8 +1,10 @@
 import os
+from types import NoneType
 import unittest
 import json
 from urllib import response
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import null
 
 from flaskr import create_app
 from models import setup_db, Question, Category
@@ -326,6 +328,59 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 404)
         self.assertEqual(data['success'], False)
         self.assertEqual(data['message'], 'requested resource not found') 
+    
+
+    #-------------------------------POST Quizzes-------------------------------#
+
+    def test_200_retrieving_new_random_question_in_all_categories(self):
+        """
+        Test that API method returns a 200
+        success response when requesting for
+        a new random question resource based on questions
+        from all categories in the database.
+        """
+
+        # Given
+        endpoint = '/api/v1/quizzes'
+        payload = {
+            'previous_questions': [5, 4, 10, 11],
+            'quiz_category': {'type': 'click', 'id': 0}
+        }
+
+		# When
+        response = self.client().post(endpoint, json=payload)
+        data = json.loads(response.data)
+		
+        # Then
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(data['success'], True)
+        self.assertTrue(data['question'])
+        self.assertIsInstance(data['question'], dict or NoneType)
+        self.assertNotIn(data['question']['id'], payload['previous_questions'])
+
+    def test_422_retrieving_new_random_question_in_all_categories(self):
+        """
+        Test that API method returns a 422
+        error response when requesting for a new random 
+        question resource - with an unprocessable payload
+        body - based on questions from all categories in the database.
+        """
+
+        # Given
+        endpoint = '/api/v1/quizzes'
+        payload = {
+            'previous_questions': [5, 4, 10, 11],
+        }
+
+		# When
+        response = self.client().post(endpoint, json=payload)
+        data = json.loads(response.data)
+		
+        # Then
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(data['success'], False)
+        self.assertTrue(data['message'], 'unprocessable entity')
+
 
 
 # Make the tests conveniently executable

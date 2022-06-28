@@ -12,23 +12,27 @@ from models import db, setup_db, Question, Category
 
 QUESTIONS_PER_PAGE = 10
 
+
 def create_app(test_config=None):
     # create and configure the app
     app = Flask(__name__)
     setup_db(app)
 
     """
-    @TODO: Set up CORS. Allow '*' for origins. Delete the sample route after completing the TODOs [COMPLETED]
+    @TODO: Set up CORS. Allow '*' for origins.
+    Delete the sample route after completing the TODOs [COMPLETED]
     """
     cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
 
     """
-    @TODO: Use the after_request decorator to set Access-Control-Allow [COMPLETED]
+    @TODO: Use the after_request decorator to set Access-Control-Allow
     """
     @app.after_request
     def after_request(response):
-        response.headers.add('Access-Control-Allow-Headers', 'Content-type, Authorization, true')
-        response.headers.add('Access-Control-Allow-Methods', 'GET, POST, PATCH, DELETE, OPTIONS')
+        response.headers.add('Access-Control-Allow-Headers',
+                             'Content-type, Authorization, true')
+        response.headers.add('Access-Control-Allow-Methods',
+                             'GET, POST, PATCH, DELETE, OPTIONS')
         response.headers.add('Access-Control-Allow-Credentials', 'true')
         return response
 
@@ -37,7 +41,7 @@ def create_app(test_config=None):
     Create an endpoint to handle GET requests
     for all available categories. [COMPLETED]
     """
-    
+
     @app.route('/api/v1/categories', methods=['GET'])
     def retrieve_categories():
         # Handle request
@@ -47,8 +51,9 @@ def create_app(test_config=None):
         # Handle data
         try:
             categories = db.session.query(Category).all()
-            formatted_categories = {category.id:category.type for category in categories}
-        except: 
+            formatted_categories = {
+                category.id: category.type for category in categories}
+        except BaseException:
             abort(500)
 
         # Verify resource data
@@ -67,11 +72,12 @@ def create_app(test_config=None):
     Create an endpoint to handle GET requests for questions,
     including pagination (every 10 questions).
     This endpoint should return a list of questions,
-    number of total questions, current category, categories. [COMPLETED]
+    number of total questions, current category, categories.
 
     TEST: At this point, when you start the application
     you should see questions and categories generated,
-    ten questions per page and pagination at the bottom of the screen for three pages.
+    ten questions per page and pagination at the bottom
+    of the screen for three pages.
     Clicking on the page numbers should update the questions.
     """
 
@@ -87,7 +93,7 @@ def create_app(test_config=None):
             paginated_questions = paginate_questions(request, questions)
             response = retrieve_categories()
             data = json.loads(json.dumps(response.json))
-        except:
+        except BaseException:
             abort(500)
 
         # Verify resource data
@@ -102,7 +108,7 @@ def create_app(test_config=None):
             'categories': data.get('categories'),
             'current_category': 'Science',
         })
-    
+
     def paginate_questions(request, questions):
         # Implement pagination
         page = request.args.get('page', 1, type=int)
@@ -116,9 +122,10 @@ def create_app(test_config=None):
 
     """
     @TODO:
-    Create an endpoint to DELETE question using a question ID. [COMPLETED]
+    Create an endpoint to DELETE question using a question ID.
 
-    TEST: When you click the trash icon next to a question, the question will be removed.
+    TEST: When you click the trash icon next to a question,
+    the question will be removed.
     This removal will persist in the database and when you refresh the page.
     """
 
@@ -128,22 +135,21 @@ def create_app(test_config=None):
         if request.method != 'DELETE':
             abort(405)
 
-		# Handle data
+            # Handle data
         question = db.session.query(Question).get_or_404(question_id)
 
-		# Persist resource data
+        # Persist resource data
         try:
             db.session.delete(question)
             db.session.commit()
-        except:
+        except BaseException:
             abort(500)
 
-		# Handle response
+            # Handle response
         return jsonify({
             'success': True,
             'status_code': 200
         })
-        
 
     """
     @TODO:
@@ -152,7 +158,8 @@ def create_app(test_config=None):
     category, and difficulty score. [COMPLETED]
 
     TEST: When you submit a question on the "Add" tab,
-    the form will clear and the question will appear at the end of the last page
+    the form will clear and the question will appear at
+    the end of the last page
     of the questions list in the "List" tab.
     """
 
@@ -168,16 +175,16 @@ def create_app(test_config=None):
         if search_term:
             return retrieve_questions_by_search_term(search_term)
 
-        # Validate request data            
+        # Validate request data
         if valid_question_format(body):
-           new_question = body.get('question', None) 
-           new_answer = body.get('answer', None) 
-           new_difficulty = body.get('difficulty', None) 
-           new_category = body.get('category', None) 
+            new_question = body.get('question', None)
+            new_answer = body.get('answer', None)
+            new_difficulty = body.get('difficulty', None)
+            new_category = body.get('category', None)
         else:
             abort(400)
 
-		# Handle data
+        # Handle data
         question_to_be_created = Question(
             question=new_question,
             answer=new_answer,
@@ -185,14 +192,14 @@ def create_app(test_config=None):
             category=new_category
         )
 
-		# Persist resource data
+        # Persist resource data
         try:
             db.session.add(question_to_be_created)
             db.session.commit()
-        except:
+        except BaseException:
             abort(500)
 
-		# Handle response
+        # Handle response
         return jsonify({
             'success': True,
             'status_code': 200
@@ -202,13 +209,12 @@ def create_app(test_config=None):
         # Verify all required keys are present
         required_keys = ['question', 'answer', 'difficulty', 'category']
         is_present = all(key in body for key in required_keys)
-        if not is_present: 
+        if not is_present:
             return False
 
         # Verify all keys have non zero or empty values
         has_values = all(body[key] for key in required_keys)
         return True if has_values else False
-
 
     """
     @TODO:
@@ -224,27 +230,25 @@ def create_app(test_config=None):
     def retrieve_questions_by_search_term(search_term):
         # Handle data
         questions = (db.session
-                        .query(Question)
-                        .order_by(Question.id)
-                        .filter(Question.question.ilike(f'%{search_term}%'))
-                        .all())
-        
+                     .query(Question)
+                     .order_by(Question.id)
+                     .filter(Question.question.ilike(f'%{search_term}%'))
+                     .all())
+
         # Verify resource data
         if len(questions) == 0:
             abort(404)
-        
+
         # Format data
         formatted_questions = [question.format() for question in questions]
-        # current_category = formatted_questions[0]['category']
 
         # Handle response
         return jsonify({
-            'success': True,                
-            'questions': formatted_questions,                
-            'total_questions': len(formatted_questions),                
-            'current_category': 'Entertainment'                
+            'success': True,
+            'questions': formatted_questions,
+            'total_questions': len(formatted_questions),
+            'current_category': 'Entertainment'
         })
-
 
     """
     @TODO:
@@ -253,46 +257,46 @@ def create_app(test_config=None):
     TEST: In the "List" tab / main screen, clicking on one of the
     categories in the left column will cause only questions of that
     category to be shown.
-    """ 
+    """
 
-    @app.route('/api/v1/categories/<int:category_id>/questions', methods=['GET'])
+    @app.route('/api/v1/categories/<int:category_id>/questions',
+               methods=['GET'])
     def retrieve_questions_by_category(category_id):
         # Handle request
         if request.method != 'GET':
             abort(405)
-        
+
         # Verify valid category id
         category = db.session.query(Category).get_or_404(category_id)
         category_type = category.format()['type']
 
-		# Handle data
+        # Handle data
         try:
             questions_by_category = (
                 db.session
-                    .query(Question)
-                    .filter(Question.category == category_id)
-                    .all()
+                .query(Question)
+                .filter(Question.category == category_id)
+                .all()
             )
             formatted_questions_by_category = [
-                question.format() 
+                question.format()
                 for question in questions_by_category
             ]
-        except:
+        except BaseException:
             abort(500)
 
-		# Verify resource data
+            # Verify resource data
         total_questions_by_category = len(formatted_questions_by_category)
         if total_questions_by_category == 0:
             abort(404)
 
-		# Handle response
+            # Handle response
         return jsonify({
             'success': True,
             'questions': formatted_questions_by_category,
             'total_questions': total_questions_by_category,
             'current_category': category_type
         })
-
 
     """
     @TODO:
@@ -313,8 +317,8 @@ def create_app(test_config=None):
             body = request.get_json()
             previous_questions = body.get('previous_questions', None)
             category = body.get('quiz_category')
-            category_type = category['type'] 
-        except:
+            category_type = category['type']
+        except BaseException:
             abort(422)
 
         # Handle data
@@ -322,38 +326,39 @@ def create_app(test_config=None):
         if category_type == 'click':
             all_questions = db.session.query(Question).all()
 
-            if len(previous_questions) != len(all_questions):        
-                next_question = get_next_question(previous_questions, all_questions)       
-            
+            if len(previous_questions) != len(all_questions):
+                next_question = get_next_question(
+                    previous_questions, all_questions)
+
                 # Verify resource data
                 if next_question['id'] in previous_questions:
                     abort(500)
         else:
-            questions_by_category = (db.session
-                                        .query(Question)
-                                        .filter(Question.category == category['id'])
-                                        .all())
+            questions_by_category = (
+                db.session .query(Question) .filter(
+                    Question.category == category['id']) .all())
 
-            if len(previous_questions) != len(questions_by_category): 
-                next_question = get_next_question(previous_questions, questions_by_category)       
-            
+            if len(previous_questions) != len(questions_by_category):
+                next_question = get_next_question(
+                    previous_questions, questions_by_category)
+
                 # Verify resource data
                 if next_question['id'] in previous_questions:
                     abort(500)
 
-		# Handle response
+        # Handle response
         return jsonify({
             'success': True,
             'question': next_question
         })
-    
+
     def get_next_question(previous_questions, questions):
         formatted_questions = [question.format() for question in questions]
         next_questions = list(
-            filter(lambda q: q['id'] not in previous_questions, formatted_questions)
+            filter(lambda q: q['id']
+                   not in previous_questions, formatted_questions)
         )
         return random.choice(next_questions)
-
 
     """
     @TODO:
@@ -378,7 +383,7 @@ def create_app(test_config=None):
             'error': 404,
             'message': 'requested resource not found'
         }), 404
-    
+
     @app.errorhandler(405)
     def methhod_not_allowed(error):
         return jsonify({
@@ -402,6 +407,5 @@ def create_app(test_config=None):
             'error': 500,
             'message': 'internal server error'
         }), 500
-    
 
     return app

@@ -1,5 +1,4 @@
 import os
-from types import NoneType
 import unittest
 import json
 from urllib import response
@@ -362,7 +361,7 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(data['success'], True)
         self.assertTrue(data['question'])
-        self.assertIsInstance(data['question'], dict or NoneType)
+        self.assertIsInstance(data['question'], dict or None)
         self.assertNotIn(data['question']['id'], payload['previous_questions'])
 
     def test_422_retrieving_new_random_question_in_all_categories(self):

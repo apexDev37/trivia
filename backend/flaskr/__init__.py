@@ -19,13 +19,13 @@ def create_app(test_config=None):
     setup_db(app)
 
     """
-    @TODO: Set up CORS. Allow '*' for origins.
-    Delete the sample route after completing the TODOs [COMPLETED]
+    @DONE: Set up CORS. Allow '*' for origins.
+    Delete the sample route after completing the TODOs
     """
     cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
 
     """
-    @TODO: Use the after_request decorator to set Access-Control-Allow
+    @DONE: Use the after_request decorator to set Access-Control-Allow
     """
     @app.after_request
     def after_request(response):
@@ -37,9 +37,9 @@ def create_app(test_config=None):
         return response
 
     """
-    @TODO:
+    @DONE:
     Create an endpoint to handle GET requests
-    for all available categories. [COMPLETED]
+    for all available categories.
     """
 
     @app.route('/api/v1/categories', methods=['GET'])
@@ -68,7 +68,7 @@ def create_app(test_config=None):
         })
 
     """
-    @TODO:
+    @DONE:
     Create an endpoint to handle GET requests for questions,
     including pagination (every 10 questions).
     This endpoint should return a list of questions,
@@ -121,7 +121,7 @@ def create_app(test_config=None):
         return paginated_questions
 
     """
-    @TODO:
+    @DONE:
     Create an endpoint to DELETE question using a question ID.
 
     TEST: When you click the trash icon next to a question,
@@ -152,15 +152,14 @@ def create_app(test_config=None):
         })
 
     """
-    @TODO:
+    @DONE:
     Create an endpoint to POST a new question,
     which will require the question and answer text,
-    category, and difficulty score. [COMPLETED]
+    category, and difficulty score.
 
     TEST: When you submit a question on the "Add" tab,
-    the form will clear and the question will appear at
-    the end of the last page
-    of the questions list in the "List" tab.
+    the form will clear and the question will appear at the
+    end of the last page of the questions list in the "List" tab.
     """
 
     @app.route('/api/v1/questions', methods=['POST'])
@@ -217,10 +216,10 @@ def create_app(test_config=None):
         return True if has_values else False
 
     """
-    @TODO:
+    @DONE:
     Create a POST endpoint to get questions based on a search term.
     It should return any questions for whom the search term
-    is a substring of the question. [COMPLETED]
+    is a substring of the question.
 
     TEST: Search by any phrase. The questions list will update to include
     only question that include that string within their question.
@@ -251,8 +250,8 @@ def create_app(test_config=None):
         })
 
     """
-    @TODO:
-    Create a GET endpoint to get questions based on category. [COMPLETED]
+    @DONE:
+    Create a GET endpoint to get questions based on category.
 
     TEST: In the "List" tab / main screen, clicking on one of the
     categories in the left column will cause only questions of that
@@ -299,8 +298,8 @@ def create_app(test_config=None):
         })
 
     """
-    @TODO:
-    Create a POST endpoint to get questions to play the quiz. [COMPLETED]
+    @DONE:
+    Create a POST endpoint to get questions to play the quiz.
     This endpoint should take category and previous question parameters
     and return a random question within the given category,
     if provided, and that is not one of the previous questions.
@@ -361,9 +360,9 @@ def create_app(test_config=None):
         return random.choice(next_questions)
 
     """
-    @TODO:
+    @DONE:
     Create error handlers for all expected errors
-    including 404 and 422. [COMPLETED]
+    including 404 and 422.
     """
 
     # --- App Request, Error Handlers

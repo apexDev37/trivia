@@ -24,7 +24,8 @@ class TriviaTestCase(unittest.TestCase):
         self.app = create_app()
         self.client = self.app.test_client
         self.database_name = TEST_DB_NAME
-        self.database_path = 'postgresql://{}:{}@{}/{}'.format(DB_USER, DB_PASSWORD, 'localhost:5432', self.database_name)
+        self.database_path = 'postgresql://{}:{}@{}/{}'.format(
+            DB_USER, DB_PASSWORD, 'localhost:5432', self.database_name)
         setup_db(self.app, self.database_path)
 
         # binds the app to the current context
@@ -33,14 +34,15 @@ class TriviaTestCase(unittest.TestCase):
             self.db.init_app(self.app)
             # create all tables
             self.db.create_all()
-    
+
     def tearDown(self):
         """Executed after reach test"""
         pass
 
     """
     TODO
-    Write at least one test for each test for successful operation and for expected errors.
+    Write at least one test for each test for successful
+    operation and for expected errors.
     """
 
     # --- CATEGORIES
@@ -94,15 +96,16 @@ class TriviaTestCase(unittest.TestCase):
         endpoint = '/api/v1/categories'
 
         # When
-        response = self.client().post(endpoint)    
+        response = self.client().post(endpoint)
         data = json.loads(response.data)
 
         # Then
         self.assertEqual(response.status_code, 405)
         self.assertEqual(data['success'], False)
-        self.assertNotIn('categories', data, 'categories key should not be in data')
+        self.assertNotIn('categories', data,
+                         'categories key should not be in data')
         self.assertEqual(data['message'], 'method not allowed')
-    
+
     # --- QUESTIONS
     # GET questions
 
@@ -128,12 +131,11 @@ class TriviaTestCase(unittest.TestCase):
         self.assertTrue(data['categories'])
         self.assertGreater(data['total_questions'], 0)
 
-    
     def test_404_when_requesting_questions_beyond_valid_pagination_page(self):
         """
         Test that API method returns a 404 error
         response when questions beyond a valid
-        pagination page are requested. 
+        pagination page are requested.
         """
 
         # Given
@@ -149,7 +151,6 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(data['success'], False)
         self.assertEqual(data['message'], 'requested resource not found')
 
-    
     # GET questions based on category
 
     def test_200_retrieving_questions_based_on_a_valid_given_category_id(self):
@@ -162,19 +163,20 @@ class TriviaTestCase(unittest.TestCase):
         # Given
         category_id = 1
         endpoint = f'/api/v1/categories/{category_id}/questions'
-		
+
         # When
         response = self.client().get(endpoint)
         data = json.loads(response.data)
 
-		# Then
+        # Then
         self.assertEqual(response.status_code, 200)
         self.assertEqual(data['success'], True)
         self.assertTrue(data['questions'])
         self.assertGreater(data['total_questions'], 0)
         self.assertTrue(data['current_category'])
 
-    def test_404_retrieving_questions_based_on_an_invalid_given_category_id(self):
+    def test_404_retrieving_questions_based_on_an_invalid_given_category_id(
+            self):
         """
         Test that API method returns a 404
         error response when requesting for
@@ -184,16 +186,15 @@ class TriviaTestCase(unittest.TestCase):
         # Given
         category_id = 404
         endpoint = f'/api/v1/categories/{category_id}/questions'
-		
+
         # When
         response = self.client().get(endpoint)
         data = json.loads(response.data)
 
-		# Then
+        # Then
         self.assertEqual(response.status_code, 404)
         self.assertEqual(data['success'], False)
         self.assertTrue(data['message'], 'requested resource not found')
-
 
     # DELETE questions
 
@@ -216,7 +217,8 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(data['success'], True)
 
-    def test_404_when_deleting_a_question_by_given_id_that_does_not_exist(self):
+    def test_404_when_deleting_a_question_by_given_id_that_does_not_exist(
+            self):
         """
         Test that API method returns a 404
         error response when requesting to
@@ -227,7 +229,7 @@ class TriviaTestCase(unittest.TestCase):
         # Given
         non_existing_question_id = 404
         endpoint = '/api/v1/questions/{}'.format(non_existing_question_id)
-        
+
         # When
         response = self.client().delete(endpoint)
         data = json.loads(response.data)
@@ -237,7 +239,6 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(data['success'], False)
         self.assertEqual(data['message'], 'requested resource not found')
 
-
     # POST questions
 
     def test_200_when_creating_a_new_valid_question_resource(self):
@@ -246,7 +247,7 @@ class TriviaTestCase(unittest.TestCase):
         success response when requesting
         to create a new question resource.
         """
-        
+
         # Given
         endpoint = '/api/v1/questions'
         new_question = {
@@ -256,20 +257,21 @@ class TriviaTestCase(unittest.TestCase):
             'category': 1
         }
 
-		# When
+        # When
         response = self.client().post(endpoint, json=new_question)
         data = json.loads(response.data)
 
-		# Then
+        # Then
         self.assertEqual(response.status_code, 200)
         self.assertEqual(data['success'], True)
 
-    def test_400_when_creating_a_new_question_resource_with_invalid_format(self):
+    def test_400_when_creating_a_new_question_resource_with_invalid_format(
+            self):
         """
         Test that API method returns a 400
         error response when requesting
         to create a new question resource
-        with an invalid body format or null values.        
+        with an invalid body format or null values.
         """
 
         # Given
@@ -280,15 +282,14 @@ class TriviaTestCase(unittest.TestCase):
             'level': 1
         }
 
-		# When
+        # When
         response = self.client().post(endpoint, json=invalid_new_question)
         data = json.loads(response.data)
 
-		# Then
+        # Then
         self.assertEqual(response.status_code, 400)
         self.assertEqual(data['success'], False)
         self.assertEqual(data['message'], 'bad request')
-
 
     # POST questions (search term)
 
@@ -301,20 +302,21 @@ class TriviaTestCase(unittest.TestCase):
 
         # Given
         search_term = {'searchTerm': 'title'}
-        endpoint = '/api/v1/questions' 
+        endpoint = '/api/v1/questions'
 
-		# When
+        # When
         response = self.client().post(endpoint, json=search_term)
         data = json.loads(response.data)
 
-		# Then
+        # Then
         self.assertEqual(response.status_code, 200)
         self.assertEqual(data['success'], True)
         self.assertTrue(data['questions'])
         self.assertGreater(data['total_questions'], 0)
         self.assertTrue(data['current_category'])
 
-    def test_404_searching_questions_by_a_given_search_term_that_do_not_exist(self):
+    def test_404_searching_questions_by_a_given_search_term_that_do_not_exist(
+            self):
         """
         Test that API method returns a 404
         error response when requesting for
@@ -324,19 +326,18 @@ class TriviaTestCase(unittest.TestCase):
 
         # Given
         search_term = {'searchTerm': 'udacity'}
-        endpoint = '/api/v1/questions' 
+        endpoint = '/api/v1/questions'
 
-		# When
+        # When
         response = self.client().post(endpoint, json=search_term)
         data = json.loads(response.data)
 
-		# Then
+        # Then
         self.assertEqual(response.status_code, 404)
         self.assertEqual(data['success'], False)
-        self.assertEqual(data['message'], 'requested resource not found') 
-    
+        self.assertEqual(data['message'], 'requested resource not found')
 
-    #-------------------------------POST Quizzes-------------------------------#
+    # ----------------------------POST Quizzes---------------------------- #
 
     def test_200_retrieving_new_random_question_in_all_categories(self):
         """
@@ -353,10 +354,10 @@ class TriviaTestCase(unittest.TestCase):
             'quiz_category': {'type': 'click', 'id': 0}
         }
 
-		# When
+        # When
         response = self.client().post(endpoint, json=payload)
         data = json.loads(response.data)
-		
+
         # Then
         self.assertEqual(response.status_code, 200)
         self.assertEqual(data['success'], True)
@@ -367,7 +368,7 @@ class TriviaTestCase(unittest.TestCase):
     def test_422_retrieving_new_random_question_in_all_categories(self):
         """
         Test that API method returns a 422
-        error response when requesting for a new random 
+        error response when requesting for a new random
         question resource - with an unprocessable payload
         body - based on questions from all categories in the database.
         """
@@ -378,15 +379,14 @@ class TriviaTestCase(unittest.TestCase):
             'previous_questions': [5, 4, 10, 11],
         }
 
-		# When
+        # When
         response = self.client().post(endpoint, json=payload)
         data = json.loads(response.data)
-		
+
         # Then
         self.assertEqual(response.status_code, 422)
         self.assertEqual(data['success'], False)
         self.assertTrue(data['message'], 'unprocessable entity')
-
 
 
 # Make the tests conveniently executable

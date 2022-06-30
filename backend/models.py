@@ -14,7 +14,7 @@ from settings import (
 database_name = DB_NAME
 database_user = DB_USER
 database_password = DB_PASSWORD
-database_path = 'postgresql://{}:{}@{}/{}'.format(DB_USER, DB_PASSWORD, 'localhost:5432', database_name)
+database_path = 'postgresql://{}:{}@{}/{}'.format(database_name, database_user, 'localhost:5432', database_name)
 
 db = SQLAlchemy()
 

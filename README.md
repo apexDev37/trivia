@@ -1,8 +1,24 @@
-# API Development and Documentation Final Project
+# Trivia
+> Advanced API Development, testing, and documentation - Final Project
 
-## Trivia App
+[![status: archived](https://img.shields.io/badge/status-archived-red.svg)](https://docs.github.com/en/repositories/archiving-a-github-repository/archiving-repositories)
+> ⚠ **Note:** This repository has been **archived** and is no longer maintained.
+```
+This project was created primarily to attain my Full-Stack Developer Certification with Udacity back in 2022.
+It is no longer in active use, and there are no current or future plans to contribute to or develop this repository further.
+
+The code and history remain available for reference. Feel free to browse or fork, but please be aware that:
+- Issues and pull requests are disabled
+- No support or updates will be provided
+
+Thanks for your interest!
+```
+
+## Introduction
 
 Udacity is invested in creating bonding experiences for its employees and students. A bunch of team members got the idea to hold trivia on a regular basis and created a webpage to manage the trivia app and play the game, but their API experience is limited and still needs to be built out.
+
+## Challenge
 
 That's where you come in! Help them finish the trivia app so they can start holding trivia and seeing who's the most knowledgeable of the bunch. The application must:
 
